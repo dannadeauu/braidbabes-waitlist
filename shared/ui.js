@@ -2,16 +2,7 @@
 // Small shared UI bits: icons, the wordmark, toasts, the confirm modal.
 // ---------------------------------------------------------------------------
 
-const HEART =
-  'M16 29C16 29 2.6 21.4 2.6 12.6 2.6 8.1 6.2 4.6 10.5 4.6c2.4 0 4.5 1.2 5.5 3 1-1.8 3.1-3 5.5-3 4.3 0 7.9 3.5 7.9 8 0 8.8-13.4 16.4-13.4 16.4z';
-
 export const icons = {
-  hearts: `<svg class="hearts" viewBox="0 0 72 34" fill="none" stroke="currentColor" stroke-width="2.4"
-      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="${HEART}" transform="translate(1,1) rotate(-12 16 16) scale(0.9)"/>
-      <path d="${HEART}" transform="translate(35,1) rotate(12 16 16) scale(0.9)"/>
-    </svg>`,
-
   bell: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
@@ -60,11 +51,20 @@ export const icons = {
     </svg>`,
 };
 
-/** The braidbabes hearts + wordmark, optionally with a script line under it. */
-export function wordmark(scriptText, scriptClass = '') {
+/**
+ * The braidbabes logo, optionally with a script line under it.
+ *
+ * This is the real brand asset (heart-shaped "bb" monogram over the wordmark),
+ * not a redrawn approximation — the mark and its lettering don't reduce to
+ * anything we could reproduce faithfully in CSS.
+ *
+ *   variant 'white'  the all-white lockup, for over the photo banner
+ *   variant 'color'  pink hearts + black wordmark, for white backgrounds
+ */
+export function wordmark(scriptText, scriptClass = '', { variant = 'color', base = '../assets' } = {}) {
   return `<div class="wordmark">
-      ${icons.hearts}
-      <div class="name">braidbabes</div>
+      <img class="logo" src="${base}/logo-${variant}.png" alt="braidbabes"
+           width="600" height="${variant === 'white' ? 206 : 198}">
       ${scriptText ? `<div class="script ${scriptClass}">${scriptText}</div>` : ''}
     </div>`;
 }

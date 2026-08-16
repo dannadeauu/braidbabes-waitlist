@@ -379,7 +379,7 @@ async function refresh() {
 
 async function main() {
   ['#hero-join', '#hero-status', '#hero-done'].forEach((sel) => {
-    $(sel).innerHTML = wordmark('Waitlist');
+    $(sel).innerHTML = wordmark('Waitlist', '', { variant: 'white' });
   });
   loadHeroPhoto();
 

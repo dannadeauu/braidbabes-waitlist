@@ -95,22 +95,13 @@ html, body {
   color: var(--ink);
 }
 
-.wordmark .hearts {
-  width: 52px;
+.wordmark .logo {
+  width: 178px;
   height: auto;
-  color: var(--pink);
   display: block;
 }
 
-.hero .wordmark .hearts { color: var(--white); }
-
-.wordmark .name {
-  font-family: var(--sans);
-  font-weight: 600;
-  font-size: 27px;
-  letter-spacing: -0.015em;
-  line-height: 1;
-}
+.hero .wordmark .logo { width: 196px; }
 
 .script {
   font-family: var(--script);
