@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>braidbabes waitlist</title>
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ============ page 1: join the waitlist ============ -->
+  <section class="screen" id="screen-join">
+    <div class="hero" id="hero-join"></div>
+
+    <div class="event-name" id="join-event"></div>
+
+    <form class="pad" id="join-form" novalidate>
+      <p class="section-label">select a service:</p>
+      <div class="svc-list" id="svc-list"></div>
+
+      <p class="section-label">enter your details:</p>
+
+      <div class="field">
+        <label class="field-label" for="in-name">name</label>
+        <input class="input" id="in-name" name="name" type="text" placeholder="name"
+               autocomplete="name" maxlength="60" required>
+        <p class="error-msg" id="err-name"></p>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="in-phone">phone number:</label>
+        <input class="input" id="in-phone" name="phone" type="tel" placeholder="phone number"
+               autocomplete="tel" inputmode="tel" maxlength="20">
+        <p class="error-msg" id="err-phone"></p>
+      </div>
+
+      <p class="wait-line" id="join-wait" style="margin-top:20px"></p>
+    </form>
+
+    <div class="btn-row" style="padding-top:14px">
+      <button class="btn btn-primary" id="btn-join" type="submit" form="join-form">join the line</button>
+    </div>
+
+    <div class="spacer"></div>
+    <div style="height:26px"></div>
+  </section>
+
+  <!-- ============ page 2: you're on the list ============ -->
+  <section class="screen" id="screen-status">
+    <div class="hero" id="hero-status"></div>
+
+    <div class="event-name" id="status-event"></div>
+
+    <div class="pad" style="padding-top:14px">
+      <p class="headline">you've been added to the waitlist!</p>
+
+      <p class="note" style="margin-top:26px">
+        you'll get a text notification<br>when it's your turn on the list.
+      </p>
+
+      <p class="note" style="margin-top:20px">
+        in the meantime, press &ldquo;refresh&rdquo;<br>
+        to see your updated estimated<br>wait time.
+      </p>
+
+      <p class="wait-line" id="status-wait" style="margin-top:32px"></p>
+    </div>
+
+    <div class="btn-row" style="padding-top:12px">
+      <button class="btn btn-primary" id="btn-refresh" type="button">refresh</button>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="pad" style="padding-bottom:8px">
+      <p class="you" id="status-you"></p>
+    </div>
+
+    <div class="btn-row" style="padding-bottom:34px">
+      <button class="btn btn-outline" id="btn-leave" type="button">leave waitlist</button>
+    </div>
+  </section>
+
+  <!-- ============ removed-by-admin notice ============ -->
+  <section class="screen" id="screen-done">
+    <div class="hero" id="hero-done"></div>
+    <div class="pad" style="padding-top:40px">
+      <p class="headline" id="done-title">you're all set!</p>
+      <p class="note" style="margin-top:18px" id="done-body">
+        you've been taken off the waitlist. thanks for coming by!
+      </p>
+    </div>
+    <div class="btn-row" style="padding-top:26px">
+      <button class="btn btn-primary" id="btn-again" type="button">join again</button>
+    </div>
+    <div class="spacer"></div>
+  </section>
+
+</div>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>

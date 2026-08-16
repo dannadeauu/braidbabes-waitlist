@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>braidbabes waitlist</title>
+<link rel="stylesheet" href="./shared/styles.css">
+<style>
+  .shell { justify-content: center; padding: 40px 26px; gap: 12px; }
+  .links { display: grid; gap: 10px; margin-top: 30px; }
+  .links a {
+    display: block; text-decoration: none; text-align: center;
+    font-size: 12.5px; font-weight: 500; padding: 13px 20px; border-radius: 8px;
+  }
+  .go-customer { background: var(--pink); color: #fff; }
+  .go-admin { background: #fff; color: var(--pink-700); border: 1px solid var(--pink-line); }
+  .hint { font-size: 11px; font-weight: 400; color: var(--muted); text-align: center;
+          line-height: 1.7; margin-top: 26px; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="wordmark">
+    <svg class="hearts" viewBox="0 0 72 34" fill="none" stroke="currentColor" stroke-width="2.4"
+         stroke-linecap="round" stroke-linejoin="round">
+      <path d="M16 29C16 29 2.6 21.4 2.6 12.6 2.6 8.1 6.2 4.6 10.5 4.6c2.4 0 4.5 1.2 5.5 3 1-1.8 3.1-3 5.5-3 4.3 0 7.9 3.5 7.9 8 0 8.8-13.4 16.4-13.4 16.4z"
+            transform="translate(1,1) rotate(-12 16 16) scale(0.9)"/>
+      <path d="M16 29C16 29 2.6 21.4 2.6 12.6 2.6 8.1 6.2 4.6 10.5 4.6c2.4 0 4.5 1.2 5.5 3 1-1.8 3.1-3 5.5-3 4.3 0 7.9 3.5 7.9 8 0 8.8-13.4 16.4-13.4 16.4z"
+            transform="translate(35,1) rotate(12 16 16) scale(0.9)"/>
+    </svg>
+    <div class="name">braidbabes</div>
+    <div class="script">Waitlist</div>
+  </div>
+
+  <div class="links">
+    <a class="go-customer" href="./customer/">customer app &mdash; point the QR code here</a>
+    <a class="go-admin" href="./admin/">admin app</a>
+  </div>
+
+  <p class="hint">
+    this page is just a launcher for testing.<br>
+    at an event, the QR code goes straight to <b>/customer/</b>.
+  </p>
+</div>
+</body>
+</html>
