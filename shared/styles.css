@@ -146,6 +146,9 @@ html, body {
   line-height: 1.65;
   color: var(--ink);
   margin: 0;
+  /* Even out the centred lines instead of leaving a short orphan on the last
+     one. Ignored by browsers that don't support it, which just wrap normally. */
+  text-wrap: balance;
 }
 
 .headline {
