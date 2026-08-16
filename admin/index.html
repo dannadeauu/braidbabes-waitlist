@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>braidbabes admin</title>
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ============ page 3: password ============ -->
+  <section class="screen" id="screen-login">
+    <div class="brandhead" id="login-brand" style="padding-top:56px"></div>
+
+    <form class="pad" id="login-form" style="padding-top:34px" novalidate>
+      <label class="field-label" for="in-pass">enter password:</label>
+      <div class="login-row">
+        <input class="input" id="in-pass" type="password" placeholder="enter password"
+               autocomplete="current-password">
+        <button class="btn btn-primary" type="submit">enter</button>
+      </div>
+      <p class="error-msg" id="err-pass"></p>
+    </form>
+
+    <div class="spacer"></div>
+  </section>
+
+  <!-- ============ page 4: the waitlist ============ -->
+  <section class="screen" id="screen-queue">
+    <div class="brandhead" id="queue-brand"></div>
+
+    <div id="queue-banner"></div>
+
+    <div class="admin-bar">
+      <span class="lbl">status:</span>
+      <button class="status-pill" id="btn-status" type="button">open</button>
+      <div class="spacer"></div>
+      <button class="btn btn-primary btn-sm" id="btn-msg-all" type="button">message everyone</button>
+    </div>
+
+    <ul class="queue" id="queue-list"></ul>
+
+    <nav class="navbar">
+      <button class="nav-btn is-active" id="nav-queue" type="button" aria-label="waitlist"></button>
+      <button class="nav-btn" id="nav-settings" type="button" aria-label="settings"></button>
+    </nav>
+  </section>
+
+  <!-- ============ page 5: settings ============ -->
+  <section class="screen" id="screen-settings">
+    <div class="brandhead" id="settings-brand"></div>
+
+    <div class="settings">
+      <div class="field">
+        <label class="field-label" for="in-event">name of event</label>
+        <input class="input" id="in-event" type="text" placeholder="enter name" maxlength="60">
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="in-braiders"># of braiders</label>
+        <input class="input" id="in-braiders" type="number" min="1" max="50" step="1"
+               placeholder="enter number" inputmode="numeric">
+      </div>
+
+      <div class="svc-table">
+        <div class="svc-head">
+          <span>service</span>
+          <span>length (per braider)</span>
+          <span></span>
+          <span></span>
+        </div>
+        <div id="svc-rows"></div>
+        <button class="btn btn-primary btn-sm" id="btn-add-svc" type="button"
+                style="margin-top:8px">add a service</button>
+      </div>
+
+      <label class="check" style="margin-top:16px">
+        <input type="checkbox" id="ck-multi">
+        <span>allow selection of multiple services during registration</span>
+      </label>
+
+      <div class="settings-group">
+        <p class="field-label">displayed wait:</p>
+        <label class="check">
+          <input type="checkbox" id="ck-time">
+          <span>hours/minutes remaining</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" id="ck-place">
+          <span>place in line</span>
+        </label>
+      </div>
+
+      <div class="divider"></div>
+
+      <p class="save-state" id="save-state"></p>
+      <p class="save-state" id="mode-state"></p>
+    </div>
+
+    <nav class="navbar">
+      <button class="nav-btn" id="nav-queue-2" type="button" aria-label="waitlist"></button>
+      <button class="nav-btn is-active" id="nav-settings-2" type="button" aria-label="settings"></button>
+    </nav>
+  </section>
+
+</div>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>
