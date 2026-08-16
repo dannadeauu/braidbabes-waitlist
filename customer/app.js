@@ -227,6 +227,51 @@ async function onLeave() {
   toast('you left the waitlist');
 }
 
+// --- failure diagnosis -----------------------------------------------------
+//
+// The three ways this realistically breaks look identical to a guest but need
+// completely different fixes, so name them apart rather than guessing later.
+
+function classifyFailure(err) {
+  // A missing method means index.html / app.js / db.js came from different
+  // deploys — i.e. the browser served a stale file out of cache.
+  if (err instanceof TypeError && /is not a function|undefined/i.test(err.message || '')) {
+    return 'stale-cache';
+  }
+  // fetch() rejecting outright (rather than returning an HTTP error) is a
+  // blocked request: an ad/privacy extension, a VPN, or no network at all.
+  if (err instanceof TypeError && /fetch|network|load failed/i.test(err.message || '')) {
+    return 'blocked';
+  }
+  if (/JWT|apikey|Invalid API key/i.test(err.message || '')) return 'bad-key';
+  if (/does not exist|schema cache|PGRST/i.test(err.message || '')) return 'schema';
+  return 'unknown';
+}
+
+function describeFailure(err) {
+  return {
+    'stale-cache':
+      'mismatched files from cache. Hard-refresh (cmd/ctrl + shift + R) — the ' +
+      'browser is pairing an old app.js with a new db.js after a deploy.',
+    blocked:
+      'the request to supabase never left the browser. Usually an ad/privacy ' +
+      'blocker or VPN blocking *.supabase.co — try an incognito window.',
+    'bad-key': 'supabase rejected the anon key in shared/config.js.',
+    schema: 'supabase is missing a table or function — re-run schema.sql.',
+    unknown: 'unrecognised failure.',
+  }[classifyFailure(err)];
+}
+
+function shortFailure(err) {
+  return {
+    'stale-cache': 'please refresh the page',
+    blocked: "can't reach the waitlist — check your ad blocker",
+    'bad-key': "can't reach the waitlist right now",
+    schema: "can't reach the waitlist right now",
+    unknown: "can't reach the waitlist right now",
+  }[classifyFailure(err)];
+}
+
 // --- shared refresh --------------------------------------------------------
 
 async function refresh() {
@@ -238,16 +283,21 @@ async function refresh() {
     state.settings = settings;
     state.entries = entries;
   } catch (err) {
-    // Usually a bad Supabase URL/key or the schema not having been run yet.
-    // Never leave the customer staring at a blank page.
-    console.error('refresh failed', err);
+    // Never leave the customer staring at a blank page — and say enough that
+    // the cause is obvious from the console instead of needing a bisect.
+    console.error(
+      `[braidbabes] could not load the waitlist.\n` +
+        `reason: ${describeFailure(err)}\n` +
+        `raw error:`,
+      err
+    );
     if (!state.settings) {
       state.settings = { ...DEFAULT_SETTINGS };
       renderJoinScreen();
       $('#btn-join').disabled = true;
       $('#btn-join').textContent = 'waitlist unavailable';
       show('screen-join');
-      toast("can't reach the waitlist right now");
+      toast(shortFailure(err));
     }
     return;
   }

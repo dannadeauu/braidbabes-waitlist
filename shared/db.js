@@ -211,6 +211,11 @@ async function createSupabaseDb() {
   const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.45.4');
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+    realtime: {
+      // Back off hard instead of hammering. On event wifi a tight reconnect
+      // loop drains phone batteries and buries real errors in the console.
+      reconnectAfterMs: (tries) => [1000, 3000, 10000, 30000][tries - 1] ?? 60000,
+    },
   });
   const listeners = new Set();
   const fire = () => listeners.forEach((fn) => fn());
@@ -225,11 +230,25 @@ async function createSupabaseDb() {
     client: sb,
 
     async init() {
+      // Live push updates are a bonus, not a requirement — the apps poll on a
+      // timer regardless. If the socket can't establish, give up rather than
+      // reconnecting forever.
       try {
-        sb.channel('bb-waitlist')
+        let failures = 0;
+        const channel = sb
+          .channel('bb-waitlist')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'waitlist_entries' }, fire)
           .on('postgres_changes', { event: '*', schema: 'public', table: 'waitlist_settings' }, fire)
-          .subscribe();
+          .subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+              failures = 0;
+            } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+              if (++failures >= 3) {
+                sb.removeChannel(channel);
+                console.warn('[braidbabes] realtime unavailable — using polling instead');
+              }
+            }
+          });
       } catch {
         /* polling covers it */
       }
