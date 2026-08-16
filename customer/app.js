@@ -22,6 +22,8 @@ const state = {
   settings: null,
   entries: [],
   selected: [],
+  pickedOwnServices: false, // once true, stop auto-selecting the first service
+  svcSignature: null, // rebuild the buttons only when the services change
   ticket: null, // { id, name, phone }
 };
 
@@ -59,20 +61,48 @@ function renderServices() {
   if (services.length === 0) {
     list.innerHTML = '<p class="note muted">no services are available right now.</p>';
     state.selected = [];
+    state.svcSignature = null;
     return;
   }
 
-  // Drop selections that no longer exist, then default to the first service.
+  // Drop selections for services the admin has since deleted or hidden.
   state.selected = state.selected.filter((id) => services.some((s) => s.id === id));
-  if (state.selected.length === 0) state.selected = [services[0].id];
 
-  list.innerHTML = services
-    .map((s) => {
-      const on = state.selected.includes(s.id);
-      return `<button type="button" class="svc-btn${on ? ' is-selected' : ''}"
-                data-svc="${esc(s.id)}" aria-pressed="${on}">${esc(s.name)}</button>`;
-    })
-    .join('');
+  // Preselect the first service as a convenience, but only until the guest has
+  // made a choice of their own. Re-applying it after that would fight them:
+  // in multi-select mode, deselecting your last pick would snap straight back.
+  if (!state.pickedOwnServices && state.selected.length === 0) {
+    state.selected = [services[0].id];
+  }
+
+  const multi = state.settings.allow_multiple;
+  const signature = JSON.stringify([multi, services.map((s) => [s.id, s.name])]);
+
+  // Only rebuild the buttons when the services themselves change. Re-creating
+  // them on every tap would replace the element mid-transition, so the fade
+  // between selected and unselected would never get a chance to run.
+  if (signature !== state.svcSignature) {
+    state.svcSignature = signature;
+    list.setAttribute('role', multi ? 'group' : 'radiogroup');
+    list.innerHTML = services
+      .map(
+        (s) => `<button type="button" class="svc-btn" data-svc="${esc(s.id)}"
+                  role="${multi ? 'checkbox' : 'radio'}"
+                  aria-checked="false">${esc(s.name)}</button>`
+      )
+      .join('');
+  }
+
+  syncServiceSelection();
+}
+
+/** Paints the current selection onto the existing buttons, so CSS can fade it. */
+function syncServiceSelection() {
+  for (const btn of document.querySelectorAll('.svc-btn')) {
+    const on = state.selected.includes(btn.dataset.svc);
+    btn.classList.toggle('is-selected', on);
+    btn.setAttribute('aria-checked', String(on));
+  }
 }
 
 function onServiceClick(e) {
@@ -80,17 +110,21 @@ function onServiceClick(e) {
   if (!btn) return;
   const id = btn.dataset.svc;
 
+  state.pickedOwnServices = true;
+
   if (state.settings.allow_multiple) {
+    // Free toggling, including all the way down to none selected. The join
+    // button is what stops an empty submission, not a sticky selection.
     state.selected = state.selected.includes(id)
       ? state.selected.filter((x) => x !== id)
       : [...state.selected, id];
-    if (state.selected.length === 0) state.selected = [id]; // never allow zero
   } else {
     state.selected = [id];
   }
 
-  renderServices();
+  syncServiceSelection();
   renderJoinWait();
+  updateJoinButton();
 }
 
 function renderJoinWait() {
@@ -100,15 +134,30 @@ function renderJoinWait() {
   $('#join-wait').textContent = `estimated wait: ${formatWait(mins)}`;
 }
 
+function updateJoinButton() {
+  const btn = $('#btn-join');
+  const closed = state.settings.status !== 'open';
+  const nothingOffered = visibleServices().length === 0;
+  const nothingPicked = state.selected.length === 0;
+
+  btn.disabled = closed || nothingOffered || nothingPicked;
+  btn.textContent = closed
+    ? 'waitlist is closed'
+    : nothingOffered
+      ? 'waitlist unavailable'
+      : nothingPicked
+        ? 'select a service'
+        : 'join the line';
+}
+
 function renderJoinScreen() {
   $('#join-event').textContent = state.settings.event_name || '';
+  $('#svc-label').textContent = state.settings.allow_multiple
+    ? 'select your services:'
+    : 'select a service:';
   renderServices();
   renderJoinWait();
-
-  const closed = state.settings.status !== 'open';
-  const btn = $('#btn-join');
-  btn.disabled = closed || visibleServices().length === 0;
-  btn.textContent = closed ? 'waitlist is closed' : 'join the line';
+  updateJoinButton();
 }
 
 async function submitJoin(e) {
@@ -121,6 +170,12 @@ async function submitJoin(e) {
   $('#err-phone').textContent = '';
   $('#in-name').classList.remove('is-error');
   $('#in-phone').classList.remove('is-error');
+
+  if (state.selected.length === 0) {
+    toast('please pick at least one service');
+    $('#svc-list').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
 
   if (!name) {
     $('#err-name').textContent = 'please enter your name';
@@ -159,8 +214,7 @@ async function submitJoin(e) {
   } catch (err) {
     console.error(err);
     toast("couldn't join the waitlist — please try again");
-    btn.disabled = false;
-    btn.textContent = 'join the line';
+    updateJoinButton();
   }
 }
 

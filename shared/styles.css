@@ -225,7 +225,6 @@ html, body {
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-primary { background: var(--pink); color: var(--white); }
-.btn-primary:not(:disabled):hover { background: var(--pink-600); }
 .btn-primary:not(:disabled):active { background: var(--pink-700); }
 
 .btn-outline {
@@ -233,14 +232,13 @@ html, body {
   color: var(--pink-700);
   border-color: var(--pink-line);
 }
-.btn-outline:not(:disabled):hover { background: var(--pink-tint); }
+.btn-outline:not(:disabled):active { background: var(--pink-tint); }
 
 .btn-ghost {
   background: transparent;
   color: var(--muted);
   border-color: transparent;
 }
-.btn-ghost:hover { color: var(--ink); }
 
 .btn-sm { padding: 7px 14px; font-size: 11px; border-radius: 7px; }
 .btn-wide { width: 100%; }
@@ -270,11 +268,20 @@ html, body {
   background: var(--white);
   color: var(--pink-700);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.08s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.svc-btn:hover { background: var(--pink-tint); }
+.svc-btn:active { transform: scale(0.985); }
+
+@media (prefers-reduced-motion: reduce) {
+  .svc-btn { transition: none; }
+  .svc-btn:active { transform: none; }
+}
 
 .svc-btn.is-selected {
   background: var(--pink);
@@ -325,7 +332,6 @@ html, body {
   transition: background 0.15s;
 }
 
-.status-pill:hover { background: var(--green-600); }
 .status-pill.is-closed { background: var(--muted); }
 
 .queue {
@@ -416,14 +422,12 @@ html, body {
 }
 
 .icon-btn svg { width: 17px; height: 17px; }
-.icon-btn:hover { background: var(--pink-tint); color: var(--pink-700); }
 
 .icon-btn.is-done {
   background: var(--green);
   color: var(--white);
   border-color: var(--green);
 }
-.icon-btn.is-done:hover { background: var(--green-600); color: var(--white); }
 
 .qi-msg { grid-column: 1 / -1; justify-self: end; margin-top: 2px; }
 
@@ -481,9 +485,7 @@ html, body {
 }
 
 .mini-btn svg { width: 15px; height: 15px; }
-.mini-btn:hover { background: var(--pink-tint); }
 .mini-btn.off { color: var(--muted); }
-.mini-btn.danger:hover { color: #c96a6a; }
 
 .check {
   display: flex;
@@ -723,4 +725,55 @@ html, body {
   background: rgba(0, 0, 0, 0.06);
   padding: 1px 4px;
   border-radius: 3px;
+}
+
+/* ---------- touch input sizing ----------
+ *
+ * iOS Safari zooms the page in whenever you focus an input whose font-size is
+ * under 16px, and it does not zoom back out when you leave the field. There's
+ * no reliable way to undo it afterwards, so the fix is to not trigger it:
+ * 16px on touch devices. (The other common workaround, maximum-scale=1 on the
+ * viewport meta, also blocks pinch-zoom, which we're not willing to take away.)
+ *
+ * Pointer-based rather than width-based so desktop keeps the compact type from
+ * the mockup — and 12.5px was small for thumb-typing a phone number anyway.
+ */
+
+@media (pointer: coarse) {
+  .input,
+  .svc-row .input {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  /* Give the minutes column room for three digits at the larger size. */
+  .svc-head,
+  .svc-row {
+    grid-template-columns: 1fr 62px 52px 32px 28px;
+  }
+
+  .svc-row .unit { font-size: 11px; }
+}
+
+/* ---------- hover ----------
+ *
+ * Every hover style lives in here on purpose. A touch browser has no pointer
+ * to move away, so it leaves :hover stuck on the last thing tapped — which on
+ * the service picker made an unselected button sit there tinted pink, looking
+ * half-selected. Gating on (hover: hover) means phones never apply these at
+ * all; the :active states above are what give a tap its feedback.
+ */
+
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:not(:disabled):hover { background: var(--pink-600); }
+  .btn-outline:not(:disabled):hover { background: var(--pink-tint); }
+  .btn-ghost:hover { color: var(--ink); }
+  .svc-btn:not(.is-selected):hover { background: var(--pink-tint); }
+  .svc-btn.is-selected:hover { background: var(--pink-600); border-color: var(--pink-600); }
+  .status-pill:hover { background: var(--green-600); }
+  .status-pill.is-closed:hover { background: var(--ink); }
+  .icon-btn:hover { background: var(--pink-tint); color: var(--pink-700); }
+  .icon-btn.is-done:hover { background: var(--green-600); color: var(--white); }
+  .mini-btn:hover { background: var(--pink-tint); }
+  .mini-btn.danger:hover { color: #c96a6a; }
 }
